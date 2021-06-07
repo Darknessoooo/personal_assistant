@@ -1,20 +1,23 @@
-from re import I
-from vk_api import longpoll
-from settings import LOGIN,PASSWORD,TOKEN
+
+from settings import LOGIN, PASSWORD, TOKEN
 import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
-import requests
+
 vk_session = vk_api.VkApi(token=TOKEN)
 longpoll = VkLongPoll(vk_session)
 
-#функция для ответа на сообщения в ЛС группы
+
+def send_sticker(id_user, id_sticker):
+  vk_session.method("messages.sendSticker", {'peer_id':id_user, 'sticker_id':id_sticker, 'random_id':0})
+#функция для ответа на сообщения в ЛС  
 def write_msg(id, text):
     vk_session.method('messages.send', {'user_id' : id, 'message' : text, 'random_id' : 0})
 for event in longpoll.listen():
     if event.type == VkEventType.MESSAGE_NEW:
-        print(event)
+      if event.from_user:
         if event.to_me:
-            if event.text == "Привет":
-                write_msg(event.user_id, "и тебе привет")
-            elif event.text == "как дела?":
-                write_msg(event.user_id, "норм") 
+            vk_session.method('messages.send', {'peer_id': event.user_id, 'attachment': "photo-162482313_457239684", 'random_id': 0})
+            vk_session.method('messages.send', {'peer_id': event.user_id, 'attachment': "video4448869_161923713", 'random_id': 0})
+            message = "Привет!\nЯ очень занят,напиши мне позже"
+            write_msg(event.user_id, message)
+            send_sticker(event.user_id, 57468)
